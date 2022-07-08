@@ -28,6 +28,7 @@ function getProductById(productId) {
 
 function displayCartItems(cart) {
     for (let item of cart) {
+      console.log(item);
         let product = getProductById(item.id);
         cartItems.innerHTML +=`<article class="cart__item" data-id="${item.id}" data-color="${item.color}">
         <div class="cart__item__img">
