@@ -7,29 +7,26 @@ function getCartContent() {
     return (JSON.parse(cartLinea));
 }
 
-fetch('http://localhost:3000/api/products')
+function getProductById(productId) {
+    fetch('http://localhost:3000/api/products')
     .then(function(res) {
         if (res.ok) {
             return res.json();
         }
     })
     .then(function(value) {
-        productCatalog = value;
+        for (let item of value) {
+            if (item._id == productId) {
+                return item;
+            }
+        };
     })
     .catch(function(error) {
         // Une erreur est survenue
     })
-
-function getProductById(productId) {
-    for (let item of productCatalog) {
-        if (item.id == productId) {
-            return item;
-        }
-    }
 }
 
 function displayCartItems(cart) {
-    console.log(cart);
     for (let item of cart) {
         let product = getProductById(item.id);
         cartItems.innerHTML +=`<article class="cart__item" data-id="${item.id}" data-color="${item.color}">
