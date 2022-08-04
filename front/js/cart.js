@@ -3,12 +3,13 @@ const totalQuantityField = document.getElementById('totalQuantity');
 const totalPriceField = document.getElementById('totalPrice');
 
 function getCartContent() {
-  // Recupere le panier sous forme d'array pour pouvoir le modifier
+  // Récupère le panier sous forme d'array pour pouvoir s'en servir
   let cartLinea = localStorage.getItem("cart");
   return (JSON.parse(cartLinea));
 }
 
-function displayCartItems(cart) {
+function displayCartItems() {
+  const cart = getCartContent();
   for (let item of cart) {
     fetch(`http://localhost:3000/api/products/${item.id}`)
       .then(function(res) {
@@ -45,21 +46,33 @@ function displayCartItems(cart) {
   }
 }
 
-displayCartItems(getCartContent());
-
-const itemQuantities = document.getElementsByClassName('itemQuantity');
-const itemPrices = document.getElementsByClassName('itemPrice');
-
 function displayTotal() {
-  let totalQuantityNumber = 0;
-  let totalPriceNumber = 0;
-  for (let i = 0; i < itemQuantities.length; i++) {
-    totalPriceNumber += parseInt(itemQuantities[i].value) * parseInt(itemPrices[i].split(',')[0]);
-    totalQuantityNumber += parseInt(itemQuantities[i].value);
-    console.log(totalPriceNumber);
-  }
-  totalPriceField.innerHTML = `${totalPriceNumber},00`;
-  totalQuantityField.innerHTML = totalQuantityNumber;
+
+  let totalQuantity = 0;
+  let totalPrice = 0;
+  const cart = getCartContent();
+
+  for (let item of cart) {
+    totalQuantity += parseInt(item.quantity);
+    fetch(`http://localhost:3000/api/products/${item.id}`)
+      .then(function(res) {
+        if (res.ok) {
+          return res.json();
+        }
+      })
+      .then(value => {
+        totalPrice += parseInt(item.quantity) * parseInt(value.price);
+        return(totalPrice);
+      })
+      .then (value => {
+        totalPriceField.innerText = value + ',00';
+      })
+      .catch(function(error) {
+        // Une erreur est survenue
+      });
+    }
+  totalQuantityField.innerText = totalQuantity;
 }
 
+displayCartItems();
 displayTotal();
